@@ -31,7 +31,7 @@ Alt+DOWN script-message RBS-downvote
 Technical details
 -----------------
 
-Only absolute paths are stored in the `ratings_file`:
+In the `ratings_file`, files and associated ratings are stored:
 
 ```json
 {
@@ -39,3 +39,8 @@ Only absolute paths are stored in the `ratings_file`:
 	"/home/username/Music/BigPlaylist/Another topic/LoremIpsum.mp3":0.810000
 }
 ```
+
+TODO
+----
+
+Add a mode where songs only repeat after playing ~75% of all available files (has to be persisted across mpv runs).
