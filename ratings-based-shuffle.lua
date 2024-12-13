@@ -4,11 +4,13 @@ require 'mp.options'
 local options = {
     directory = ".",
     ratings_file = "RBS-ratings.txt",
+    exclude = "/dev/null",
 }
 read_options(options, "ratings-based-shuffle")
 
 all_files = {}
 ratings = {}
+init = False
 
 function init_playlist()
     mp.osd_message("Initializing ratings-based shuffle..")
@@ -22,7 +24,8 @@ function init_playlist()
 
     mp.register_event("end-file", auto_add_file)
     auto_add_file(nil)
-    auto_add_file(nil)
+
+    init = True
 end
 
 function load(path)
@@ -42,6 +45,10 @@ function load_ratings(path)
         file = io.open(path, "r")
         io.input(file)
         ratings, err = utils.parse_json(io.read())
+        if not (err == nil) then
+            msg.warn("could not load preferences")
+            msg.warn(err)
+        end
         io.close(file)
     else
         msg.warn("could not load ratings")
@@ -62,29 +69,42 @@ function save_ratings(path)
 end
 
 function upvote()
+    if not init then
+        return
+    end
     file = mp.get_property("path")
     if ratings[file] == nil then
         ratings[file] = 1.1
     else
         ratings[file] = ratings[file] * 1.1
     end
+    mp.osd_message("new rating: " .. ratings[file])
     save_ratings(options.ratings_file)
 end
 
 function downvote()
+    if not init then
+        return
+    end
     file = mp.get_property("path")
     if ratings[file] == nil then
         ratings[file] = 0.9
     else
         ratings[file] = ratings[file] * 0.9
     end
+    mp.osd_message("new rating: " .. ratings[file])
     save_ratings(options.ratings_file)
 end
 
 function auto_add_file(event)
     while true do
+        ::select_file::
+
         idx = math.random(#all_files)
         file = all_files[idx]
+        if not (options.exclude == nil) and file:find(options.exclude, 1, true) == 1 then
+            goto select_file
+        end
         chance = ratings[file]
         if chance == nil then
             chance = 1.0
