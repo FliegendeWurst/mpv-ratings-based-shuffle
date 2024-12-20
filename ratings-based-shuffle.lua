@@ -10,7 +10,7 @@ read_options(options, "ratings-based-shuffle")
 
 all_files = {}
 ratings = {}
-init = False
+init = false
 
 function init_playlist()
     mp.osd_message("Initializing ratings-based shuffle..")
@@ -25,7 +25,7 @@ function init_playlist()
     mp.register_event("end-file", auto_add_file)
     auto_add_file(nil)
 
-    init = True
+    init = true
 end
 
 function load(path)
